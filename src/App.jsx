@@ -18,6 +18,7 @@ const hostFlags = [
 
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
+  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
   const Page = routes[path] || LeaderboardPage;
 
   useEffect(() => {
@@ -26,6 +27,11 @@ export default function App() {
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   function navigate(event, nextPath) {
     event.preventDefault();
@@ -45,6 +51,24 @@ export default function App() {
             {hostFlags.map((flag) => (
               <img key={flag.name} src={flag.src} alt={flag.name} title={flag.name} />
             ))}
+          </div>
+          <div className="theme-toggle" aria-label="Theme">
+            <button
+              className={theme === "light" ? "active" : ""}
+              type="button"
+              onClick={() => setTheme("light")}
+              aria-label="Use light theme"
+            >
+              ☀
+            </button>
+            <button
+              className={theme === "league" ? "active league-mark" : "league-mark"}
+              type="button"
+              onClick={() => setTheme("league")}
+              aria-label="Use League of Legends theme"
+            >
+              L
+            </button>
           </div>
           <nav aria-label="Main navigation">
             <a className={path === "/" ? "active" : ""} href="/" onClick={(event) => navigate(event, "/")}>
