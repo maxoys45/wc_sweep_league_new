@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  included_files = ["fixtures.json"]
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

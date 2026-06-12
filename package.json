@@ -1,0 +1,25 @@
+{
+  "name": "wc_sweep_league_2",
+  "version": "1.0.0",
+  "description": "World Cup sweep league table and results entry site.",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "netlify:dev": "npx netlify dev",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "^10.7.9",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.2",
+    "vite": "^8.0.16"
+  }
+}
