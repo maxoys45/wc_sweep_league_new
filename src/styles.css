@@ -355,7 +355,7 @@ a {
 }
 
 .table-wrap {
-  overflow-x: auto;
+  overflow: visible;
 }
 
 table {
@@ -383,7 +383,7 @@ th {
 }
 
 tbody tr:nth-child(1) {
-  background: linear-gradient(90deg, rgb(200 16 46 / 9%), transparent);
+  background: linear-gradient(90deg, rgb(0 99 65 / 10%), transparent);
 }
 
 [data-theme="league"] tbody tr:nth-child(1) {
@@ -405,11 +405,9 @@ tr:last-child td {
 }
 
 .points {
-  color: var(--red);
   font-size: 1.15rem;
 }
 
-[data-theme="league"] .points,
 [data-theme="league"] .versus {
   color: var(--league-gold-bright);
 }
@@ -421,17 +419,55 @@ tr:last-child td {
 }
 
 .chips span {
+  position: relative;
   border-radius: 999px;
   border: 1px solid rgb(8 27 64 / 14%);
   padding: 0.35rem 0.6rem 0.5rem;
   background:
-    linear-gradient(90deg, var(--team-primary) 0 50%, var(--team-secondary) 50%) bottom / 100% 0.28rem
-      no-repeat,
+    var(--team-stripe) bottom / 100% 0.28rem no-repeat,
     #f8fbff;
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 70%);
   color: var(--ink);
   font-size: 0.85rem;
   font-weight: 700;
+}
+
+.team-chip {
+  cursor: help;
+}
+
+.team-chip:focus {
+  outline: 3px solid rgb(23 78 166 / 18%);
+  outline-offset: 2px;
+}
+
+.team-chip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  left: 50%;
+  z-index: 20;
+  width: max-content;
+  max-width: 14rem;
+  border-radius: 0.7rem;
+  padding: 0.55rem 0.7rem;
+  color: var(--white);
+  background: var(--navy);
+  box-shadow: 0 12px 32px rgb(8 27 64 / 22%);
+  font-size: 0.78rem;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -0.2rem);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+  white-space: nowrap;
+}
+
+.team-chip:hover::after,
+.team-chip:focus::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 .teams-button {
@@ -489,11 +525,20 @@ tr:last-child td {
 [data-theme="league"] .chips span {
   border-color: rgb(200 170 110 / 22%);
   background:
-    linear-gradient(90deg, var(--team-primary) 0 50%, var(--team-secondary) 50%) bottom / 100% 0.28rem
-      no-repeat,
+    var(--team-stripe) bottom / 100% 0.28rem no-repeat,
     #0a1428;
   color: #f0e6d2;
   box-shadow: inset 0 0 0 1px rgb(10 200 185 / 8%);
+}
+
+[data-theme="league"] .team-chip:focus {
+  outline-color: rgb(10 200 185 / 24%);
+}
+
+[data-theme="league"] .team-chip::after {
+  color: #010a13;
+  background: linear-gradient(135deg, var(--league-gold-bright), var(--league-gold));
+  box-shadow: 0 12px 32px rgb(0 0 0 / 35%);
 }
 
 .password-card {

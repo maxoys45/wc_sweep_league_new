@@ -4,40 +4,40 @@ import { getFixtures } from "../api.js";
 import { buildLeaderboard } from "../league.js";
 
 const teamColours = {
-  Algeria: ["#006233", "#ffffff"],
+  Algeria: ["#006233", "#ffffff", "#d21034"],
   Argentina: ["#75aadb", "#ffffff"],
   Australia: ["#00843d", "#ffcd00"],
   Austria: ["#ed2939", "#ffffff"],
-  Belgium: ["#000000", "#ffd90c"],
+  Belgium: ["#000000", "#ffd90c", "#ef3340"],
   "Bosnia and Herzegovina": ["#002395", "#fecb00"],
   Brazil: ["#009739", "#fedd00"],
   Canada: ["#ff0000", "#ffffff"],
-  Colombia: ["#fcd116", "#003893"],
-  Croatia: ["#ff0000", "#ffffff"],
-  Czechia: ["#11457e", "#ffffff"],
-  "Côte d'Ivoire": ["#f77f00", "#ffffff"],
-  "DR Congo": ["#007fff", "#f7d618"],
-  Ecuador: ["#ffdd00", "#034ea2"],
-  Egypt: ["#ce1126", "#ffffff"],
+  Colombia: ["#fcd116", "#003893", "#ce1126"],
+  Croatia: ["#ff0000", "#ffffff", "#171796"],
+  Czechia: ["#11457e", "#ffffff", "#d7141a"],
+  "Côte d'Ivoire": ["#f77f00", "#ffffff", "#009e60"],
+  "DR Congo": ["#007fff", "#f7d618", "#ce1021"],
+  Ecuador: ["#ffdd00", "#034ea2", "#ed1c24"],
+  Egypt: ["#ce1126", "#ffffff", "#000000"],
   England: ["#ffffff", "#ce1126"],
-  France: ["#0055a4", "#ffffff"],
-  Germany: ["#000000", "#ffce00"],
-  "IR Iran": ["#239f40", "#ffffff"],
-  Iraq: ["#ce1126", "#ffffff"],
+  France: ["#0055a4", "#ffffff", "#ef4135"],
+  Germany: ["#000000", "#dd0000", "#ffce00"],
+  "IR Iran": ["#239f40", "#ffffff", "#da0000"],
+  Iraq: ["#ce1126", "#ffffff", "#000000"],
   Japan: ["#ffffff", "#bc002d"],
-  "Korea Republic": ["#ffffff", "#c60c30"],
-  Mexico: ["#006847", "#ffffff"],
+  "Korea Republic": ["#ffffff", "#c60c30", "#003478"],
+  Mexico: ["#006847", "#ffffff", "#ce1126"],
   Morocco: ["#c1272d", "#006233"],
-  Netherlands: ["#ff4f00", "#ffffff"],
-  Norway: ["#ba0c2f", "#ffffff"],
-  Panama: ["#ffffff", "#005293"],
-  Paraguay: ["#d52b1e", "#ffffff"],
+  Netherlands: ["#ae1c28", "#ffffff", "#21468b"],
+  Norway: ["#ba0c2f", "#ffffff", "#00205b"],
+  Panama: ["#ffffff", "#005293", "#d21034"],
+  Paraguay: ["#d52b1e", "#ffffff", "#0038a8"],
   Portugal: ["#006600", "#ff0000"],
   Qatar: ["#8a1538", "#ffffff"],
   "Saudi Arabia": ["#006c35", "#ffffff"],
   Scotland: ["#005eb8", "#ffffff"],
-  Senegal: ["#00853f", "#fdef42"],
-  "South Africa": ["#007a4d", "#ffb612"],
+  Senegal: ["#00853f", "#fdef42", "#e31b23"],
+  "South Africa": ["#007a4d", "#ffb612", "#de3831", "#002395"],
   Spain: ["#aa151b", "#f1bf00"],
   Sweden: ["#006aa7", "#fecc00"],
   Switzerland: ["#ff0000", "#ffffff"],
@@ -67,6 +67,7 @@ export default function LeaderboardPage() {
   }, []);
 
   const leaderboard = useMemo(() => buildLeaderboard(players, fixtures), [fixtures]);
+  const teamRecords = useMemo(() => buildTeamRecords(fixtures), [fixtures]);
   const completedFixtures = fixtures.filter(
     (fixture) => fixture.HomeTeamScore !== null && fixture.AwayTeamScore !== null,
   ).length;
@@ -125,9 +126,7 @@ export default function LeaderboardPage() {
                 <td className="teams-cell">
                   <div className="chips">
                     {row.teams.map((team) => (
-                      <span key={team} style={getTeamColourStyle(team)}>
-                        {team}
-                      </span>
+                      <TeamChip key={team} team={team} record={teamRecords[team]} />
                     ))}
                   </div>
                   <button className="teams-button" type="button" onClick={() => setSelectedPlayer(row)}>
@@ -160,15 +159,30 @@ export default function LeaderboardPage() {
             </div>
             <div className="chips modal-chips">
               {selectedPlayer.teams.map((team) => (
-                <span key={team} style={getTeamColourStyle(team)}>
-                  {team}
-                </span>
+                <TeamChip key={team} team={team} record={teamRecords[team]} />
               ))}
             </div>
           </section>
         </div>
       ) : null}
     </section>
+  );
+}
+
+function TeamChip({ team, record }) {
+  const teamRecord = record || { wins: 0, draws: 0, losses: 0 };
+  const tooltip = `${teamRecord.wins}W ${teamRecord.draws}D ${teamRecord.losses}L`;
+
+  return (
+    <span
+      className="team-chip"
+      style={getTeamColourStyle(team)}
+      tabIndex="0"
+      aria-label={tooltip}
+      data-tooltip={tooltip}
+    >
+      {team}
+    </span>
   );
 }
 
@@ -187,10 +201,52 @@ function formatRank(index, totalRows) {
 }
 
 function getTeamColourStyle(team) {
-  const [primary = "#eef4ff", secondary = "#174ea6"] = teamColours[team] || [];
+  const colours = teamColours[team] || ["#eef4ff", "#174ea6"];
 
   return {
-    "--team-primary": primary,
-    "--team-secondary": secondary,
+    "--team-stripe": buildTeamStripe(colours),
   };
+}
+
+function buildTeamStripe(colours) {
+  const segmentSize = 100 / colours.length;
+  const stops = colours.flatMap((colour, index) => {
+    const start = index * segmentSize;
+    const end = (index + 1) * segmentSize;
+
+    return [`${colour} ${start}%`, `${colour} ${end}%`];
+  });
+
+  return `linear-gradient(90deg, ${stops.join(", ")})`;
+}
+
+function buildTeamRecords(fixtures) {
+  const records = {};
+
+  fixtures.forEach((fixture) => {
+    if (fixture.HomeTeamScore === null || fixture.AwayTeamScore === null) {
+      return;
+    }
+
+    addTeamRecord(records, fixture.HomeTeam, fixture.HomeTeamScore, fixture.AwayTeamScore);
+    addTeamRecord(records, fixture.AwayTeam, fixture.AwayTeamScore, fixture.HomeTeamScore);
+  });
+
+  return records;
+}
+
+function addTeamRecord(records, team, teamScore, opponentScore) {
+  records[team] ||= { wins: 0, draws: 0, losses: 0 };
+
+  if (teamScore > opponentScore) {
+    records[team].wins += 1;
+    return;
+  }
+
+  if (teamScore === opponentScore) {
+    records[team].draws += 1;
+    return;
+  }
+
+  records[team].losses += 1;
 }
