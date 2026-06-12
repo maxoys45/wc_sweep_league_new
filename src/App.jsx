@@ -1,11 +1,20 @@
 import { useEffect, useState } from "react";
 import LeaderboardPage from "./pages/LeaderboardPage.jsx";
 import ResultsPage from "./pages/ResultsPage.jsx";
+import canadaFlag from "./assets/ca.svg";
+import mexicoFlag from "./assets/mx.svg";
+import usaFlag from "./assets/us.svg";
 
 const routes = {
   "/": LeaderboardPage,
   "/results": ResultsPage,
 };
+
+const hostFlags = [
+  { name: "Canada", src: canadaFlag },
+  { name: "USA", src: usaFlag },
+  { name: "Mexico", src: mexicoFlag },
+];
 
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
@@ -27,22 +36,29 @@ export default function App() {
   return (
     <div className="app">
       <header className="site-header">
-        <div>
-          <p className="eyebrow">USA 2026 World Cup</p>
-          <h1>Stars & Stripes Sweep</h1>
+        <div className="header-title">
+          <p className="eyebrow">Canada • USA • Mexico 2026</p>
+          <h1>League of Credgends Sweep League</h1>
         </div>
-        <nav aria-label="Main navigation">
-          <a className={path === "/" ? "active" : ""} href="/" onClick={(event) => navigate(event, "/")}>
-            Leaderboard
-          </a>
-          <a
-            className={path === "/results" ? "active" : ""}
-            href="/results"
-            onClick={(event) => navigate(event, "/results")}
-          >
-            Results
-          </a>
-        </nav>
+        <div className="header-actions">
+          <div className="host-flags" aria-label="2026 host countries">
+            {hostFlags.map((flag) => (
+              <img key={flag.name} src={flag.src} alt={flag.name} title={flag.name} />
+            ))}
+          </div>
+          <nav aria-label="Main navigation">
+            <a className={path === "/" ? "active" : ""} href="/" onClick={(event) => navigate(event, "/")}>
+              Leaderboard
+            </a>
+            <a
+              className={path === "/results" ? "active" : ""}
+              href="/results"
+              onClick={(event) => navigate(event, "/results")}
+            >
+              Results
+            </a>
+          </nav>
+        </div>
       </header>
       <main>
         <Page />
