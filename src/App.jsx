@@ -51,7 +51,7 @@ export default function App() {
               ))}
             </div>
           </div>
-          <h1>League of Credgends Sweep League</h1>
+          <h1>League of Credgends Sweeps League</h1>
         </div>
         <div className="header-actions">
           <div className="theme-toggle" aria-label="Theme">

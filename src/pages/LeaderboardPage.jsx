@@ -88,7 +88,7 @@ export default function LeaderboardPage() {
           <h2>Current standings</h2>
           <p>
             Points are awarded to each player&apos;s assigned teams: 3 for a win, 1 for a draw and 0 for a
-            loss. Ties are decided by total goal difference.
+            loss. Ties are decided by total goal difference. For more info, <a target="_blank" href="https://www.youtube.com/watch?v=RBQ7MLElimo">click here</a>.
           </p>
         </div>
         <div className="stat-card">
