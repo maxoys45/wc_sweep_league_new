@@ -126,6 +126,13 @@ a {
   padding: 0.35rem 0.5rem;
 }
 
+.eyebrow-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.35rem;
+}
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -170,7 +177,6 @@ a {
 }
 
 [data-theme="league"] .theme-toggle,
-[data-theme="league"] .host-flags,
 [data-theme="league"] .site-header nav {
   background: rgb(10 20 40 / 90%);
   box-shadow: inset 0 0 0 1px rgb(200 170 110 / 25%);
@@ -178,19 +184,15 @@ a {
 
 .host-flags {
   display: flex;
-  gap: 0.35rem;
-  border-radius: 999px;
-  padding: 0.3rem;
-  background: #f7faff;
-  box-shadow: inset 0 0 0 1px rgb(8 27 64 / 8%);
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .host-flags img {
-  width: 2rem;
-  height: 1.35rem;
-  border-radius: 0.25rem;
+  width: 1.45rem;
+  height: 0.95rem;
+  border-radius: 0.12rem;
   object-fit: cover;
-  box-shadow: 0 1px 3px rgb(8 27 64 / 18%);
 }
 
 .site-header nav {
@@ -225,7 +227,7 @@ a {
 }
 
 .eyebrow {
-  margin: 0 0 0.35rem;
+  margin: 0;
   color: var(--red);
   font-size: 0.78rem;
   font-weight: 800;
@@ -366,7 +368,7 @@ td {
   padding: 1rem;
   border-bottom: 1px solid var(--line);
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 th {
@@ -430,6 +432,58 @@ tr:last-child td {
   color: var(--ink);
   font-size: 0.85rem;
   font-weight: 700;
+}
+
+.teams-button {
+  display: none;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(8 27 64 / 45%);
+}
+
+.team-modal {
+  width: min(420px, 100%);
+  border: 1px solid rgb(8 27 64 / 10%);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background: #ffffff;
+  box-shadow: 0 24px 80px rgb(8 27 64 / 28%);
+}
+
+[data-theme="league"] .team-modal {
+  border-color: rgb(200 170 110 / 25%);
+  background: #0a1428;
+  color: #f0e6d2;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 45%);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.modal-header button {
+  padding: 0.55rem 0.8rem;
+}
+
+.modal-chips {
+  gap: 0.55rem;
 }
 
 [data-theme="league"] .chips span {
@@ -539,21 +593,43 @@ tr:last-child td {
   }
 
   .header-actions {
-    align-items: stretch;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
   }
 
   .host-flags {
     justify-content: center;
   }
 
+  .theme-toggle {
+    flex: 0 0 auto;
+  }
+
   .site-header nav {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
   }
 
   .site-header nav a {
     flex: 1;
     text-align: center;
+  }
+
+  th,
+  td {
+    padding: 0.8rem 0.65rem;
+  }
+
+  .optional-col {
+    display: none;
+  }
+
+  .teams-cell .chips {
+    display: none;
+  }
+
+  .teams-button {
+    display: inline-flex;
   }
 
   .score-row {

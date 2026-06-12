@@ -43,15 +43,17 @@ export default function App() {
     <div className="app">
       <header className="site-header">
         <div className="header-title">
-          <p className="eyebrow">Canada • USA • Mexico 2026</p>
+          <div className="eyebrow-row">
+            <p className="eyebrow">Canada • USA • Mexico 2026</p>
+            <div className="host-flags" aria-label="2026 host countries">
+              {hostFlags.map((flag) => (
+                <img key={flag.name} src={flag.src} alt={flag.name} title={flag.name} />
+              ))}
+            </div>
+          </div>
           <h1>League of Credgends Sweep League</h1>
         </div>
         <div className="header-actions">
-          <div className="host-flags" aria-label="2026 host countries">
-            {hostFlags.map((flag) => (
-              <img key={flag.name} src={flag.src} alt={flag.name} title={flag.name} />
-            ))}
-          </div>
           <div className="theme-toggle" aria-label="Theme">
             <button
               className={theme === "light" ? "active" : ""}

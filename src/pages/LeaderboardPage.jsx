@@ -52,6 +52,7 @@ export default function LeaderboardPage() {
   const [fixtures, setFixtures] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   useEffect(() => {
     getFixtures()
@@ -103,10 +104,10 @@ export default function LeaderboardPage() {
               <th>Player</th>
               <th>Pts</th>
               <th>GD</th>
-              <th>Played</th>
-              <th>W</th>
-              <th>D</th>
-              <th>L</th>
+              <th className="optional-col">Played</th>
+              <th className="optional-col">W</th>
+              <th className="optional-col">D</th>
+              <th className="optional-col">L</th>
               <th>Teams</th>
             </tr>
           </thead>
@@ -117,11 +118,11 @@ export default function LeaderboardPage() {
                 <td className="strong">{row.player}</td>
                 <td className="points">{row.points}</td>
                 <td>{formatGoalDifference(row.goalDifference)}</td>
-                <td>{row.played}</td>
-                <td>{row.wins}</td>
-                <td>{row.draws}</td>
-                <td>{row.losses}</td>
-                <td>
+                <td className="optional-col">{row.played}</td>
+                <td className="optional-col">{row.wins}</td>
+                <td className="optional-col">{row.draws}</td>
+                <td className="optional-col">{row.losses}</td>
+                <td className="teams-cell">
                   <div className="chips">
                     {row.teams.map((team) => (
                       <span key={team} style={getTeamColourStyle(team)}>
@@ -129,12 +130,44 @@ export default function LeaderboardPage() {
                       </span>
                     ))}
                   </div>
+                  <button className="teams-button" type="button" onClick={() => setSelectedPlayer(row)}>
+                    Teams
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {selectedPlayer ? (
+        <div className="modal-backdrop" role="presentation" onClick={() => setSelectedPlayer(null)}>
+          <section
+            className="team-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="team-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="modal-header">
+              <div>
+                <p className="eyebrow">Assigned Teams</p>
+                <h3 id="team-modal-title">{selectedPlayer.player}</h3>
+              </div>
+              <button type="button" onClick={() => setSelectedPlayer(null)} aria-label="Close teams popup">
+                Close
+              </button>
+            </div>
+            <div className="chips modal-chips">
+              {selectedPlayer.teams.map((team) => (
+                <span key={team} style={getTeamColourStyle(team)}>
+                  {team}
+                </span>
+              ))}
+            </div>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }
