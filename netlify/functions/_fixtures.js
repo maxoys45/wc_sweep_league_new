@@ -39,11 +39,23 @@ function getFixturesStoreName() {
     return process.env.FIXTURES_STORE_NAME;
   }
 
-  if (process.env.CONTEXT === "production") {
+  if (isProductionRuntime()) {
     return PRODUCTION_STORE_NAME;
   }
 
   return `${PRODUCTION_STORE_NAME}-${process.env.CONTEXT || "local"}`;
+}
+
+function isProductionRuntime() {
+  if (process.env.CONTEXT !== "production") {
+    return false;
+  }
+
+  if (!process.env.URL || !process.env.DEPLOY_PRIME_URL) {
+    return true;
+  }
+
+  return process.env.DEPLOY_PRIME_URL === process.env.URL;
 }
 
 export function jsonResponse(body, init = {}) {
