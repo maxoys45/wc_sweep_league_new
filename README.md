@@ -21,21 +21,21 @@ Install dependencies:
 npm install
 ```
 
-Run the frontend only:
+Run the site locally:
 
 ```bash
 npm run dev
 ```
 
-This uses `fixtures.json` as a read-only fallback for the leaderboard.
+In local Vite dev, result saves are stored in your browser's local storage so you can test entering multiple results without Netlify Functions.
 
 Run with Netlify Functions:
 
 ```bash
-RESULTS_PASSWORD=your-password npm run netlify:dev
+npm run netlify:dev
 ```
 
-Use this mode when testing result saves.
+Use this mode only when testing the deployed-style Function flow. You must set `RESULTS_PASSWORD` locally before saving results.
 
 ## Netlify Deployment
 
@@ -52,3 +52,12 @@ RESULTS_PASSWORD=your-password
 ```
 
 The first deployed read uses `fixtures.json` as seed data. After the first saved result, Netlify Blobs becomes the source of truth for fixtures.
+
+## Deploy Previews
+
+Netlify deploy previews and branch deploys use separate Blob stores from production, so testing result saves on a preview URL will not overwrite live production results. If the preview store is empty, it reads from the production store first so the preview starts with the current live results.
+
+- Production store: `world-cup-sweep-league`.
+- Preview/dev store: `world-cup-sweep-league-{CONTEXT}`.
+
+You can override the store name with `FIXTURES_STORE_NAME` if you need a specific staging data store.

@@ -37,7 +37,7 @@ export default async function updateResult(request) {
       return jsonResponse({ error: "Scores must be whole numbers greater than or equal to 0" }, { status: 400 });
     }
 
-    const fixtures = await readFixtures();
+    const fixtures = Array.isArray(body.fixtures) ? body.fixtures : await readFixtures();
     const fixtureIndex = fixtures.findIndex((fixture) => fixture.MatchNumber === matchNumber);
 
     if (fixtureIndex === -1) {
