@@ -6,11 +6,20 @@ const PRODUCTION_STORE_NAME = "world-cup-sweep-league";
 const FIXTURES_KEY = "fixtures";
 
 export async function readFixtures() {
-  const store = getStore(getFixturesStoreName());
+  const storeName = getFixturesStoreName();
+  const store = getStore(storeName);
   const savedFixtures = await store.get(FIXTURES_KEY, { type: "json" });
 
   if (savedFixtures) {
     return savedFixtures;
+  }
+
+  if (storeName !== PRODUCTION_STORE_NAME) {
+    const productionFixtures = await getStore(PRODUCTION_STORE_NAME).get(FIXTURES_KEY, { type: "json" });
+
+    if (productionFixtures) {
+      return productionFixtures;
+    }
   }
 
   const seedPath = join(process.cwd(), "fixtures.json");

@@ -55,7 +55,7 @@ The first deployed read uses `fixtures.json` as seed data. After the first saved
 
 ## Deploy Previews
 
-Netlify deploy previews and branch deploys use separate Blob stores from production, so testing result saves on a preview URL will not overwrite live production results.
+Netlify deploy previews and branch deploys use separate Blob stores from production, so testing result saves on a preview URL will not overwrite live production results. If the preview store is empty, it reads from the production store first so the preview starts with the current live results.
 
 - Production store: `world-cup-sweep-league`.
 - Preview/dev store: `world-cup-sweep-league-{CONTEXT}`.
