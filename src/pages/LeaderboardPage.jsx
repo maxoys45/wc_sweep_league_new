@@ -16,7 +16,7 @@ const teamColours = {
   Croatia: ["#ff0000", "#ffffff", "#171796"],
   Czechia: ["#11457e", "#ffffff", "#d7141a"],
   "Côte d'Ivoire": ["#f77f00", "#ffffff", "#009e60"],
-  "DR Congo": ["#007fff", "#f7d618", "#ce1021"],
+  "Congo DR": ["#007fff", "#f7d618", "#ce1021"],
   Ecuador: ["#ffdd00", "#034ea2", "#ed1c24"],
   Egypt: ["#ce1126", "#ffffff", "#000000"],
   England: ["#ffffff", "#ce1126"],
