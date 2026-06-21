@@ -54,10 +54,17 @@ export default function ResultsPage() {
         homeTeamScore: score.home,
         awayTeamScore: score.away,
         password,
+        fixtures,
       });
 
-      setFixtures(result.fixtures);
-      setScores(buildScoreState(result.fixtures));
+      setFixtures((currentFixtures) => replaceFixture(currentFixtures, result.fixture));
+      setScores((currentScores) => ({
+        ...currentScores,
+        [fixture.MatchNumber]: {
+          home: result.fixture.HomeTeamScore ?? "",
+          away: result.fixture.AwayTeamScore ?? "",
+        },
+      }));
       setMessage(`Saved ${fixture.HomeTeam} vs ${fixture.AwayTeam}.`);
     } catch (error) {
       setMessage(error.message);
@@ -157,6 +164,10 @@ function buildScoreState(fixtures) {
       },
     ]),
   );
+}
+
+function replaceFixture(fixtures, nextFixture) {
+  return fixtures.map((fixture) => (fixture.MatchNumber === nextFixture.MatchNumber ? nextFixture : fixture));
 }
 
 function formatFixtureDate(dateUtc) {
