@@ -59,5 +59,6 @@ Netlify deploy previews and branch deploys use separate Blob stores from product
 
 - Production store: `world-cup-sweep-league`.
 - Preview/dev store: `world-cup-sweep-league-{CONTEXT}`.
+- Draft/manual deploys only use the production store if Netlify reports the deploy's prime URL as the canonical site URL.
 
 You can override the store name with `FIXTURES_STORE_NAME` if you need a specific staging data store.
