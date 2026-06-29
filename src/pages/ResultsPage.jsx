@@ -26,6 +26,7 @@ export default function ResultsPage() {
 
   const upcomingFixtures = useMemo(() => fixtures.filter((fixture) => !hasResult(fixture)), [fixtures]);
   const pastFixtures = useMemo(() => fixtures.filter((fixture) => hasResult(fixture)), [fixtures]);
+  const roundEightMatchNumbers = useMemo(() => getRoundEightMatchNumbers(fixtures), [fixtures]);
 
   function updateLocalScore(matchNumber, field, value) {
     setScores((currentScores) => ({
@@ -118,6 +119,7 @@ export default function ResultsPage() {
         onScoreChange={updateLocalScore}
         emptyMessage="All fixtures currently have saved results."
         variant="upcoming"
+        roundEightMatchNumbers={roundEightMatchNumbers}
       />
 
       <FixtureSection
@@ -132,6 +134,7 @@ export default function ResultsPage() {
         onScoreChange={updateLocalScore}
         emptyMessage="No results have been saved yet."
         variant="past"
+        roundEightMatchNumbers={roundEightMatchNumbers}
       />
     </section>
   );
@@ -149,6 +152,7 @@ function FixtureSection({
   onScoreChange,
   emptyMessage,
   variant,
+  roundEightMatchNumbers,
 }) {
   const isPastSection = variant === "past";
 
@@ -176,7 +180,8 @@ function FixtureSection({
               >
                 <div className="fixture-meta">
                   <span>Match {fixture.MatchNumber}</span>
-                  <span>{fixture.Group}</span>
+                  <span>{getRoundLabel(fixture, roundEightMatchNumbers)}</span>
+                  {fixture.Group ? <span>{fixture.Group}</span> : null}
                   <span>{formatFixtureDate(fixture.DateUtc)}</span>
                 </div>
                 <div className="score-row">
@@ -239,6 +244,44 @@ function replaceFixture(fixtures, nextFixture) {
 
 function hasResult(fixture) {
   return fixture.HomeTeamScore !== null && fixture.AwayTeamScore !== null;
+}
+
+function getRoundEightMatchNumbers(fixtures) {
+  return fixtures
+    .filter((fixture) => fixture.RoundNumber === 8)
+    .sort((a, b) => {
+      const dateSort = new Date(a.DateUtc).getTime() - new Date(b.DateUtc).getTime();
+      return dateSort || a.MatchNumber - b.MatchNumber;
+    })
+    .map((fixture) => fixture.MatchNumber);
+}
+
+function getRoundLabel(fixture, roundEightMatchNumbers) {
+  if (fixture.RoundNumber >= 1 && fixture.RoundNumber <= 3) {
+    return "Group Stage";
+  }
+
+  if (fixture.RoundNumber === 4) {
+    return "Round of 32";
+  }
+
+  if (fixture.RoundNumber === 5) {
+    return "Round of 16";
+  }
+
+  if (fixture.RoundNumber === 6) {
+    return "Quarter Finals";
+  }
+
+  if (fixture.RoundNumber === 7) {
+    return "Semi Finals";
+  }
+
+  if (fixture.RoundNumber === 8) {
+    return roundEightMatchNumbers[0] === fixture.MatchNumber ? "Third Place Play-off" : "Final";
+  }
+
+  return `Round ${fixture.RoundNumber}`;
 }
 
 function formatFixtureDate(dateUtc) {
