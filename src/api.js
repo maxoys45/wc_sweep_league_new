@@ -57,7 +57,7 @@ function getLocalFixtures() {
   }
 
   try {
-    return JSON.parse(savedFixtures);
+    return mergeFixtures(seedFixtures, JSON.parse(savedFixtures));
   } catch {
     localStorage.removeItem(LOCAL_FIXTURES_KEY);
     return seedFixtures;
@@ -102,4 +102,32 @@ function updateLocalResult({ matchNumber, homeTeamScore, awayTeamScore, fixtures
     fixture: nextFixture,
     fixtures: updatedFixtures,
   };
+}
+
+function mergeFixtures(seedFixtureList, savedFixtureList) {
+  const savedByMatchNumber = new Map(savedFixtureList.map((fixture) => [fixture.MatchNumber, fixture]));
+  const seedMatchNumbers = new Set(seedFixtureList.map((fixture) => fixture.MatchNumber));
+  const mergedFixtures = seedFixtureList.map((fixture) => {
+    const savedFixture = savedByMatchNumber.get(fixture.MatchNumber);
+
+    if (!savedFixture || !hasResult(savedFixture)) {
+      return fixture;
+    }
+
+    return {
+      ...fixture,
+      HomeTeamScore: savedFixture.HomeTeamScore,
+      AwayTeamScore: savedFixture.AwayTeamScore,
+      Winner: savedFixture.Winner,
+    };
+  });
+  const savedOnlyResults = savedFixtureList.filter(
+    (fixture) => !seedMatchNumbers.has(fixture.MatchNumber) && hasResult(fixture),
+  );
+
+  return [...mergedFixtures, ...savedOnlyResults];
+}
+
+function hasResult(fixture) {
+  return fixture.HomeTeamScore !== null && fixture.AwayTeamScore !== null;
 }

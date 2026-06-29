@@ -53,6 +53,8 @@ RESULTS_PASSWORD=your-password
 
 The first deployed read uses `fixtures.json` as seed data. After the first saved result, Netlify Blobs becomes the source of truth for fixtures.
 
+When `fixtures.json` is updated with newly decided knockout matches, the site automatically merges the latest fixture details with saved results from Netlify Blobs by `MatchNumber`.
+
 ## Deploy Previews
 
 Netlify deploy previews and branch deploys use separate Blob stores from production, so testing result saves on a preview URL will not overwrite live production results. If the preview store is empty, it reads from the production store first so the preview starts with the current live results.
