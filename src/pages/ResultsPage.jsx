@@ -179,10 +179,14 @@ function FixtureSection({
                 onSubmit={(event) => onSave(event, fixture)}
               >
                 <div className="fixture-meta">
-                  <span>Match {fixture.MatchNumber}</span>
-                  <span>{getRoundLabel(fixture, roundEightMatchNumbers)}</span>
-                  {fixture.Group ? <span>{fixture.Group}</span> : null}
-                  <span>{formatFixtureDate(fixture.DateUtc)}</span>
+                  <div className="fixture-meta-primary">
+                    <span className="meta-pill meta-pill-match">Match {fixture.MatchNumber}</span>
+                    <span className="meta-pill meta-pill-round">{getRoundLabel(fixture, roundEightMatchNumbers)}</span>
+                  </div>
+                  <div className="fixture-meta-secondary">
+                    {fixture.Group ? <span>{fixture.Group}</span> : null}
+                    <span>{formatFixtureDate(fixture.DateUtc)}</span>
+                  </div>
                 </div>
                 <div className="score-row">
                   <label>
