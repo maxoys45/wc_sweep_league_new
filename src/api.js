@@ -21,9 +21,9 @@ export async function getFixtures() {
   }
 }
 
-export async function updateResult({ matchNumber, homeTeamScore, awayTeamScore, password, fixtures }) {
+export async function updateResult({ matchNumber, homeTeamScore, awayTeamScore, penaltyWinner, password, fixtures }) {
   if (import.meta.env.DEV) {
-    return updateLocalResult({ matchNumber, homeTeamScore, awayTeamScore, fixtures });
+    return updateLocalResult({ matchNumber, homeTeamScore, awayTeamScore, penaltyWinner, fixtures });
   }
 
   const response = await fetch("/.netlify/functions/update-result", {
@@ -35,6 +35,7 @@ export async function updateResult({ matchNumber, homeTeamScore, awayTeamScore, 
       matchNumber,
       homeTeamScore,
       awayTeamScore,
+      penaltyWinner,
       password,
       fixtures,
     }),
@@ -64,7 +65,7 @@ function getLocalFixtures() {
   }
 }
 
-function updateLocalResult({ matchNumber, homeTeamScore, awayTeamScore, fixtures }) {
+function updateLocalResult({ matchNumber, homeTeamScore, awayTeamScore, penaltyWinner, fixtures }) {
   const nextFixtures = fixtures.length ? fixtures : getLocalFixtures();
   const fixtureIndex = nextFixtures.findIndex((fixture) => fixture.MatchNumber === matchNumber);
 
@@ -86,11 +87,20 @@ function updateLocalResult({ matchNumber, homeTeamScore, awayTeamScore, fixtures
   }
 
   const fixture = nextFixtures[fixtureIndex];
+  const nextPenaltyWinner = normalisePenaltyWinner(penaltyWinner);
+  const isKnockoutDraw = fixture.RoundNumber > 3 && hasHomeScore && nextHomeScore === nextAwayScore;
+
+  if (isKnockoutDraw && !nextPenaltyWinner) {
+    throw new Error("Select who won on penalties");
+  }
+
+  const savedPenaltyWinner = isKnockoutDraw ? nextPenaltyWinner : "";
   const nextFixture = {
     ...fixture,
     HomeTeamScore: hasHomeScore ? nextHomeScore : null,
     AwayTeamScore: hasAwayScore ? nextAwayScore : null,
-    Winner: hasHomeScore ? getWinner(fixture.HomeTeam, fixture.AwayTeam, nextHomeScore, nextAwayScore) : "",
+    Winner: hasHomeScore ? getWinner(fixture.HomeTeam, fixture.AwayTeam, nextHomeScore, nextAwayScore, savedPenaltyWinner) : "",
+    PenaltyWinner: hasHomeScore ? savedPenaltyWinner : "",
   };
   const updatedFixtures = nextFixtures.map((currentFixture) =>
     currentFixture.MatchNumber === matchNumber ? nextFixture : currentFixture,
@@ -119,6 +129,7 @@ function mergeFixtures(seedFixtureList, savedFixtureList) {
       HomeTeamScore: savedFixture.HomeTeamScore,
       AwayTeamScore: savedFixture.AwayTeamScore,
       Winner: savedFixture.Winner,
+      PenaltyWinner: savedFixture.PenaltyWinner || "",
     };
   });
   const savedOnlyResults = savedFixtureList.filter(
@@ -130,4 +141,8 @@ function mergeFixtures(seedFixtureList, savedFixtureList) {
 
 function hasResult(fixture) {
   return fixture.HomeTeamScore !== null && fixture.AwayTeamScore !== null;
+}
+
+function normalisePenaltyWinner(value) {
+  return value === "Home" || value === "Away" ? value : "";
 }

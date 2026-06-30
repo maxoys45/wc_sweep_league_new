@@ -25,7 +25,7 @@ export default function ResultsPage() {
   }, []);
 
   const upcomingFixtures = useMemo(() => fixtures.filter((fixture) => !hasResult(fixture)), [fixtures]);
-  const pastFixtures = useMemo(() => fixtures.filter((fixture) => hasResult(fixture)), [fixtures]);
+  const pastFixtures = useMemo(() => fixtures.filter((fixture) => hasResult(fixture)).reverse(), [fixtures]);
   const roundEightMatchNumbers = useMemo(() => getRoundEightMatchNumbers(fixtures), [fixtures]);
 
   function updateLocalScore(matchNumber, field, value) {
@@ -50,6 +50,7 @@ export default function ResultsPage() {
         matchNumber: fixture.MatchNumber,
         homeTeamScore: score.home,
         awayTeamScore: score.away,
+        penaltyWinner: score.penaltyWinner,
         password,
         fixtures,
       });
@@ -60,6 +61,7 @@ export default function ResultsPage() {
         [fixture.MatchNumber]: {
           home: result.fixture.HomeTeamScore ?? "",
           away: result.fixture.AwayTeamScore ?? "",
+          penaltyWinner: result.fixture.PenaltyWinner ?? "",
         },
       }));
       localStorage.setItem(REMEMBERED_PASSWORD_KEY, password);
@@ -169,8 +171,9 @@ function FixtureSection({
       {fixtures.length ? (
         <div className="fixture-list">
           {fixtures.map((fixture) => {
-            const score = scores[fixture.MatchNumber] || { home: "", away: "" };
+            const score = scores[fixture.MatchNumber] || { home: "", away: "", penaltyWinner: "" };
             const isSaving = savingMatch === fixture.MatchNumber;
+            const canUsePenalties = fixture.RoundNumber > 3 && isDrawScore(score);
 
             return (
               <form
@@ -214,7 +217,24 @@ function FixtureSection({
                   </label>
                 </div>
                 <div className="fixture-actions">
-                  <span>{fixture.Winner ? `Winner: ${fixture.Winner}` : "No result yet"}</span>
+                  <div className="fixture-result-controls">
+                    {fixture.RoundNumber > 3 ? (
+                      <label className="penalty-select">
+                        Penalties
+                        <select
+                          value={score.penaltyWinner ?? ""}
+                          onChange={(event) => onScoreChange(fixture.MatchNumber, "penaltyWinner", event.target.value)}
+                          disabled={!canUsePenalties}
+                          aria-label={`${fixture.HomeTeam} vs ${fixture.AwayTeam} penalty winner`}
+                        >
+                          <option value="">No penalties</option>
+                          <option value="Home">{fixture.HomeTeam}</option>
+                          <option value="Away">{fixture.AwayTeam}</option>
+                        </select>
+                      </label>
+                    ) : null}
+                    <span>{formatWinnerLabel(fixture)}</span>
+                  </div>
                   <button type="submit" disabled={isSaving || !password}>
                     {isSaving ? "Saving..." : isPastSection ? "Update score" : "Save score"}
                   </button>
@@ -237,6 +257,7 @@ function buildScoreState(fixtures) {
       {
         home: fixture.HomeTeamScore ?? "",
         away: fixture.AwayTeamScore ?? "",
+        penaltyWinner: fixture.PenaltyWinner ?? "",
       },
     ]),
   );
@@ -248,6 +269,22 @@ function replaceFixture(fixtures, nextFixture) {
 
 function hasResult(fixture) {
   return fixture.HomeTeamScore !== null && fixture.AwayTeamScore !== null;
+}
+
+function isDrawScore(score) {
+  return score.home !== "" && score.away !== "" && Number(score.home) === Number(score.away);
+}
+
+function formatWinnerLabel(fixture) {
+  if (!fixture.Winner) {
+    return "No result yet";
+  }
+
+  if (fixture.PenaltyWinner) {
+    return `Winner: ${fixture.Winner} (pens)`;
+  }
+
+  return `Winner: ${fixture.Winner}`;
 }
 
 function getRoundEightMatchNumbers(fixtures) {

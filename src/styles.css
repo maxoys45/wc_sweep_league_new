@@ -696,6 +696,47 @@ tr:last-child td {
   font-weight: 700;
 }
 
+.fixture-result-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.penalty-select {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.penalty-select select {
+  border: 1px solid #cdd8e6;
+  border-radius: 999px;
+  padding: 0.45rem 0.65rem;
+  color: var(--ink);
+  background: var(--white);
+  font: inherit;
+  font-weight: 700;
+}
+
+.penalty-select select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+[data-theme="league"] .penalty-select {
+  color: #a09b8c;
+}
+
+[data-theme="league"] .penalty-select select {
+  border-color: rgb(200 170 110 / 32%);
+  color: #f0e6d2;
+  background: rgb(1 10 19 / 85%);
+}
+
 .fixture-meta-primary,
 .fixture-meta-secondary {
   display: flex;

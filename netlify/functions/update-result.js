@@ -22,6 +22,7 @@ export default async function updateResult(request) {
     const matchNumber = Number(body.matchNumber);
     const homeTeamScore = normaliseScore(body.homeTeamScore);
     const awayTeamScore = normaliseScore(body.awayTeamScore);
+    const penaltyWinner = normalisePenaltyWinner(body.penaltyWinner);
     const hasHomeScore = body.homeTeamScore !== "" && body.homeTeamScore !== null && body.homeTeamScore !== undefined;
     const hasAwayScore = body.awayTeamScore !== "" && body.awayTeamScore !== null && body.awayTeamScore !== undefined;
 
@@ -45,11 +46,19 @@ export default async function updateResult(request) {
     }
 
     const fixture = fixtures[fixtureIndex];
+    const isKnockoutDraw = fixture.RoundNumber > 3 && hasHomeScore && homeTeamScore === awayTeamScore;
+
+    if (isKnockoutDraw && !penaltyWinner) {
+      return jsonResponse({ error: "Select who won on penalties" }, { status: 400 });
+    }
+
+    const nextPenaltyWinner = isKnockoutDraw ? penaltyWinner : "";
     const nextFixture = {
       ...fixture,
       HomeTeamScore: hasHomeScore ? homeTeamScore : null,
       AwayTeamScore: hasAwayScore ? awayTeamScore : null,
-      Winner: hasHomeScore ? getWinner(fixture.HomeTeam, fixture.AwayTeam, homeTeamScore, awayTeamScore) : "",
+      Winner: hasHomeScore ? getWinner(fixture.HomeTeam, fixture.AwayTeam, homeTeamScore, awayTeamScore, nextPenaltyWinner) : "",
+      PenaltyWinner: hasHomeScore ? nextPenaltyWinner : "",
     };
     const nextFixtures = fixtures.map((currentFixture, index) =>
       index === fixtureIndex ? nextFixture : currentFixture,
@@ -69,3 +78,7 @@ export default async function updateResult(request) {
 export const config = {
   path: "/.netlify/functions/update-result",
 };
+
+function normalisePenaltyWinner(value) {
+  return value === "Home" || value === "Away" ? value : "";
+}

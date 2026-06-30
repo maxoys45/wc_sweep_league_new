@@ -47,6 +47,7 @@ function mergeFixtures(seedFixtures, savedFixtures) {
       HomeTeamScore: savedFixture.HomeTeamScore,
       AwayTeamScore: savedFixture.AwayTeamScore,
       Winner: savedFixture.Winner,
+      PenaltyWinner: savedFixture.PenaltyWinner || "",
     };
   });
   const savedOnlyResults = savedFixtures.filter(

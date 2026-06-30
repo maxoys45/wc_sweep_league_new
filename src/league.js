@@ -1,4 +1,4 @@
-export function getWinner(homeTeam, awayTeam, homeScore, awayScore) {
+export function getWinner(homeTeam, awayTeam, homeScore, awayScore, penaltyWinner = "") {
   if (homeScore === null || awayScore === null) {
     return "";
   }
@@ -8,6 +8,14 @@ export function getWinner(homeTeam, awayTeam, homeScore, awayScore) {
   }
 
   if (awayScore > homeScore) {
+    return awayTeam;
+  }
+
+  if (penaltyWinner === "Home") {
+    return homeTeam;
+  }
+
+  if (penaltyWinner === "Away") {
     return awayTeam;
   }
 
@@ -56,8 +64,24 @@ export function buildLeaderboard(players, fixtures) {
       return;
     }
 
-    addFixturePoints(rowsByPlayer, teamToPlayer, fixture.HomeTeam, homeScore, awayScore);
-    addFixturePoints(rowsByPlayer, teamToPlayer, fixture.AwayTeam, awayScore, homeScore);
+    addFixturePoints(
+      rowsByPlayer,
+      teamToPlayer,
+      fixture.HomeTeam,
+      homeScore,
+      awayScore,
+      fixture.PenaltyWinner === "Home",
+      Boolean(fixture.PenaltyWinner),
+    );
+    addFixturePoints(
+      rowsByPlayer,
+      teamToPlayer,
+      fixture.AwayTeam,
+      awayScore,
+      homeScore,
+      fixture.PenaltyWinner === "Away",
+      Boolean(fixture.PenaltyWinner),
+    );
   });
 
   return Array.from(rowsByPlayer.values()).sort((a, b) => {
@@ -77,7 +101,15 @@ export function buildLeaderboard(players, fixtures) {
   });
 }
 
-function addFixturePoints(rowsByPlayer, teamToPlayer, team, teamScore, opponentScore) {
+function addFixturePoints(
+  rowsByPlayer,
+  teamToPlayer,
+  team,
+  teamScore,
+  opponentScore,
+  wonOnPenalties = false,
+  matchHadPenalties = false,
+) {
   const playerName = teamToPlayer.get(team);
 
   if (!playerName) {
@@ -88,13 +120,18 @@ function addFixturePoints(rowsByPlayer, teamToPlayer, team, teamScore, opponentS
   row.played += 1;
   row.goalDifference += teamScore - opponentScore;
 
-  if (teamScore > opponentScore) {
+  if (teamScore > opponentScore || wonOnPenalties) {
     row.points += 3;
     row.wins += 1;
     return;
   }
 
   if (teamScore === opponentScore) {
+    if (matchHadPenalties) {
+      row.losses += 1;
+      return;
+    }
+
     row.points += 1;
     row.draws += 1;
     return;

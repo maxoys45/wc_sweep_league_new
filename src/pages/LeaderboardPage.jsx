@@ -228,22 +228,41 @@ function buildTeamRecords(fixtures) {
       return;
     }
 
-    addTeamRecord(records, fixture.HomeTeam, fixture.HomeTeamScore, fixture.AwayTeamScore);
-    addTeamRecord(records, fixture.AwayTeam, fixture.AwayTeamScore, fixture.HomeTeamScore);
+    addTeamRecord(
+      records,
+      fixture.HomeTeam,
+      fixture.HomeTeamScore,
+      fixture.AwayTeamScore,
+      fixture.PenaltyWinner === "Home",
+      Boolean(fixture.PenaltyWinner),
+    );
+    addTeamRecord(
+      records,
+      fixture.AwayTeam,
+      fixture.AwayTeamScore,
+      fixture.HomeTeamScore,
+      fixture.PenaltyWinner === "Away",
+      Boolean(fixture.PenaltyWinner),
+    );
   });
 
   return records;
 }
 
-function addTeamRecord(records, team, teamScore, opponentScore) {
+function addTeamRecord(records, team, teamScore, opponentScore, wonOnPenalties = false, matchHadPenalties = false) {
   records[team] ||= { wins: 0, draws: 0, losses: 0 };
 
-  if (teamScore > opponentScore) {
+  if (teamScore > opponentScore || wonOnPenalties) {
     records[team].wins += 1;
     return;
   }
 
   if (teamScore === opponentScore) {
+    if (matchHadPenalties) {
+      records[team].losses += 1;
+      return;
+    }
+
     records[team].draws += 1;
     return;
   }
